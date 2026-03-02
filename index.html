@@ -307,6 +307,47 @@
 
   .result-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.5rem; }
 
+  .editable-label-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .editable-label { cursor: pointer; transition: opacity 0.2s; }
+  .editable-label:hover { opacity: 0.7; }
+
+  .edit-label-btn {
+    background: none; border: none; font-size: 0.75rem;
+    cursor: pointer; opacity: 0.45; padding: 2px; line-height: 1;
+    transition: opacity 0.2s;
+  }
+  .edit-label-btn:hover { opacity: 1; }
+  .edit-label-btn.small { font-size: 0.6rem; }
+
+  .label-edit-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--gold);
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-align: center;
+    outline: none;
+    width: 230px;
+    padding: 2px 4px;
+    margin-bottom: 0.5rem;
+  }
+  .label-edit-input.sub {
+    font-size: 0.8rem;
+    text-transform: none;
+    letter-spacing: 0;
+    width: 270px;
+    color: var(--text-muted);
+    margin-bottom: 0;
+  }
+
   .result-amount {
     font-family: 'Cormorant Garamond', serif;
     font-size: 3rem;
@@ -633,10 +674,16 @@
   <div id="tab-results" class="content" style="display:none">
     <p class="section-title">Projected Income</p>
 
-    <div class="result-hero">
-      <p class="result-label">Average Monthly Income</p>
+    <div class="result-hero" id="result-hero-box">
+      <div class="editable-label-wrap" id="label-top-wrap">
+        <p class="result-label editable-label" id="label-top" onclick="editLabel('label-top')">Average Monthly Income (Net)</p>
+        <button class="edit-label-btn" onclick="editLabel('label-top')" title="Edit label">✏️</button>
+      </div>
       <p class="result-amount" id="res-monthly">—</p>
-      <p class="result-sub">Projected with AirLandlords management</p>
+      <div class="editable-label-wrap" id="label-sub-wrap">
+        <p class="result-sub editable-label" id="label-sub" onclick="editLabel('label-sub')">Projected with AirLandlords management</p>
+        <button class="edit-label-btn small" onclick="editLabel('label-sub')" title="Edit">✏️</button>
+      </div>
     </div>
 
     <div class="card">
@@ -1239,6 +1286,37 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════ EDITABLE LABELS ═══════════════════════════════════════
+function editLabel(id) {
+  const el = document.getElementById(id);
+  if (!el || el.tagName === 'INPUT') return;
+  const isSub = id === 'label-sub';
+  const currentText = el.textContent;
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'label-edit-input' + (isSub ? ' sub' : '');
+  input.value = currentText;
+  el.replaceWith(input);
+  input.focus();
+  input.select();
+
+  function save() {
+    const newText = input.value.trim() || currentText;
+    const newEl = document.createElement('p');
+    newEl.className = isSub ? 'result-sub editable-label' : 'result-label editable-label';
+    newEl.id = id;
+    newEl.textContent = newText;
+    newEl.onclick = () => editLabel(id);
+    input.replaceWith(newEl);
+  }
+
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    if (e.key === 'Escape') { input.value = currentText; input.blur(); }
+  });
 }
 
 // Close modals on overlay click
