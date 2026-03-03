@@ -348,6 +348,11 @@
     margin-bottom: 0;
   }
 
+  #pdf-note:focus {
+    border-color: var(--gold) !important;
+    background: var(--dark2) !important;
+  }
+
   .result-amount {
     font-family: 'Cormorant Garamond', serif;
     font-size: 3rem;
@@ -665,6 +670,11 @@
         <button class="cond-btn active" onclick="setCondition('same', this)">Same<span>0%</span></button>
         <button class="cond-btn" onclick="setCondition('better', this)">Better<span>+20%</span></button>
       </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title">📋 Net Projection Note <span style="font-size:0.7rem;color:var(--text-muted);font-weight:400">(appears on PDF)</span></p>
+      <textarea id="pdf-note" rows="3" placeholder="e.g. All projections are Net after bills paid, AirLandlords fees paid, and platform fees paid." style="width:100%;background:var(--dark3);border:1px solid var(--dark3);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:10px;resize:vertical;outline:none;line-height:1.5;box-sizing:border-box;">All projections are Net after bills paid, AirLandlords fees paid, and platform fees paid.</textarea>
     </div>
 
     <button class="btn-primary" onclick="calculate()">Calculate Earnings</button>
@@ -1125,7 +1135,10 @@ function generatePDF() {
 
   doc.setFontSize(11);
   doc.setTextColor(...gold);
-  doc.text('PROJECTED RENTAL INCOME REPORT', W/2, 43, { align: 'center' });
+  doc.text('NET PROJECTED RENTAL INCOME REPORT', W/2, 43, { align: 'center' });
+
+  // Logo top-right
+  try { doc.addImage(LOGO_B64, 'JPEG', W - 42, 5, 30, 30); } catch(e) {}
 
   // Landlord info box
   let y = 60;
@@ -1157,15 +1170,30 @@ function generatePDF() {
   doc.text(`Uplift Applied: ${r.upliftPct}%`, 120, y+22);
   doc.text(`Condition: ${r.condition}`, 120, y+29);
 
-  // Hero numbers
-  y = 108;
+  // Net note box (below landlord details)
+  y = 102;
+  const noteText = (document.getElementById('pdf-note').value || '').trim();
+  if (noteText) {
+    doc.setFillColor(15, 15, 15);
+    doc.roundedRect(15, y, W-30, 13, 3, 3, 'F');
+    doc.setDrawColor(...gold);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(15, y, W-30, 13, 3, 3, 'S');
+    doc.setFont('helvetica', 'bolditalic');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...gold);
+    doc.text('* ' + noteText, 20, y + 8.5, { maxWidth: W - 44 });
+    y = 118;
+  } else {
+    y = 108;
+  }
   // Three cards
   const cardW = 56; const cardH = 30; const gap = 6; const startX = 15;
 
   const cards = [
-    { label: 'AVG MONTHLY INCOME', value: fmtNum(r.avgMonthly), color: gold },
-    { label: 'ANNUAL (AIRLANDLORDS)', value: fmtNum(r.airAnnual), color: gold },
-    { label: 'EXTRA vs STANDARD', value: '+' + fmtNum(r.upliftAmount), color: [76, 175, 80] },
+    { label: 'NET AVG MONTHLY INCOME', value: fmtNum(r.avgMonthly), color: gold },
+    { label: 'NET ANNUAL (AIRLANDLORDS)', value: fmtNum(r.airAnnual), color: gold },
+    { label: 'NET EXTRA vs STANDARD', value: '+' + fmtNum(r.upliftAmount), color: [76, 175, 80] },
   ];
 
   cards.forEach((c, i) => {
