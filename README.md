@@ -31,3 +31,10 @@ The static form uses a simple URL-encoded POST and follows Google's ContentServi
 Run `node verify.mjs` from this folder. It compares 75 cases to the original committed calculator and checks the zero-uplift fix, backend storage acknowledgement, retries, conflicting IDs, invalid input, enquiry consent and spreadsheet formula escaping. Backend tests use a store double and do not establish production storage.
 
 Browser verification so far: public page opens without PIN; full postcode is normalized; property inputs continue to contact capture; Results navigation remains locked before submission. Mobile visual QA passed at 375px with a real Google Sheet write and confirmed result reveal. Complete the final public-URL smoke test after publication.
+
+
+## Landlord-facing introduction and social assets
+
+The root page now introduces the offer for London landlords, explains the three-step journey and leads into the existing calculator. Landing buttons and the Back to introduction control do not reset calculation/contact inputs. `#estimate` opens the property inputs directly. `landing.css` and `landing.js` contain the introduction; the underlying calculator and Google storage are unchanged. The two landlord JPEG assets provide illustrative imagery and a social link preview. They were created with AI and are not claimed to depict a managed property.
+
+Ready-to-share feed and story graphics, captions and publishing notes are in the local campaign folder. Add the calculator link to the Instagram bio or story link sticker before publishing. No social posts or paid ads are published automatically.
