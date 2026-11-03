@@ -1,5 +1,5 @@
 // Deploy as a Web app: execute as owner, access Anyone. The Sheet stays private.
-const ALLOWED_ORIGINS = ['https://ceptrade.github.io', 'http://127.0.0.1:8787'];
+const ALLOWED_ORIGINS = ['https://ceptrade.github.io', 'http://127.0.0.1:8787', 'https://calculator.corporateluxe.co.uk', 'https://corporateluxe.co.uk', 'https://www.corporateluxe.co.uk'];
 const HEADERS = ['Timestamp', 'First Name', 'Email', 'Mobile Phone', 'Property Postcode', 'Bedrooms', 'Average Monthly Estimate GBP', 'Annual Estimate GBP', 'Standard Annual GBP', 'Extra Annual GBP', 'Source', 'Status', 'Enquiry Consent', 'Consent Version', 'Request ID', 'Market Monthly GBP', 'Standard Monthly GBP', 'Uplift Percent', 'Condition', 'Monthly Breakdown JSON'];
 
 function setup() {
@@ -27,6 +27,7 @@ function text(value, max) {
 }
 function safeCell(value) { return /^[=+\-@\t\r]/.test(value) ? "'" + value : value; }
 function validateLead(p) {
+  if (p && p.flow === 'corporateluxe-v2') return validatePropertyEnquiry(p);
   if (!p || !ALLOWED_ORIGINS.includes(p.origin) || p.website || p.consent !== true || p.consentVersion !== 'property-enquiry-v1') throw new Error('Invalid enquiry');
   const requestId = text(p.requestId, 36);
   if (!/^[a-f0-9-]{36}$/.test(requestId)) throw new Error('Invalid request');
@@ -58,6 +59,9 @@ function doPost(e) {
       const id = PropertiesService.getScriptProperties().getProperty('LEADS_SHEET_ID');
       if (!id) throw new Error('Run setup first');
       const sheet = SpreadsheetApp.openById(id).getSheetByName('Calculator Leads');
+      if (lead.flow === 'corporateluxe-v2') {
+        receipt = savePropertyEnquiry(sheet, lead, p);
+      } else {
       const rows = sheet.getLastRow();
       const existing = rows > 1 ? sheet.getRange(2,15,rows-1,1).createTextFinder(lead.requestId).matchEntireCell(true).findNext() : null;
       if (!existing) {
@@ -70,6 +74,7 @@ function doPost(e) {
         if (String(old[1]).replace(/^'/,'') !== lead.firstName || String(old[2]).replace(/^'/,'') !== lead.email || String(old[3]).replace(/^'/,'') !== lead.mobile || old[4] !== lead.postcode || old[6] !== lead.average || old[7] !== lead.annual) throw new Error('Request conflict');
       }
       receipt = {type:'airlandlords-lead', requestId:lead.requestId, ok:true, avgMonthly:lead.average, airAnnual:lead.annual};
+      }
     } finally { lock.releaseLock(); }
   } catch (error) {
     // Do not log personal details or expose internal errors to public callers.
@@ -82,3 +87,34 @@ function doPost(e) {
 }
 
 function doGet() { return ContentService.createTextOutput('AirLandlords enquiry endpoint is available. Submit through the calculator.'); }
+
+
+// V2 collects qualified enquiries. No automatic valuation is claimed or fabricated.
+const ENQUIRY_EXTRA_HEADERS = ['Full Name', 'Letting Duration', 'Property Scope', 'Start Time', 'Estimate Status', 'Brand', 'Flow Version'];
+function validatePropertyEnquiry(p) {
+  if (!ALLOWED_ORIGINS.includes(p.origin) || p.website || p.consent !== true || p.consentVersion !== 'property-enquiry-v2') throw new Error('Invalid enquiry');
+  const requestId = text(p.requestId,36);
+  if (!/^[a-f0-9-]{36}$/.test(requestId)) throw new Error('Invalid request');
+  const firstName=text(p.firstName,80),fullName=text(p.fullName,120),email=text(p.email,254),mobile=text(p.mobile,25),postcode=text(p.postcode,10).toUpperCase();
+  if (firstName!==fullName.split(/\s+/)[0]) throw new Error('Invalid name');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\+?[\d\s().-]+$/.test(mobile) || mobile.replace(/\D/g,'').length<10 || mobile.replace(/\D/g,'').length>15) throw new Error('Invalid contact');
+  if (!/^(GIR 0AA|[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][A-Z]{2})$/.test(postcode)) throw new Error('Invalid postcode');
+  if (!Number.isInteger(p.bedrooms) || p.bedrooms<0 || p.bedrooms>10 || !['6+ months','1–6 months','Less than 1 month'].includes(p.lettingDuration) || !['Whole property','Private room'].includes(p.propertyScope) || !['As soon as possible','2–6 months','6+ months'].includes(p.startTime)) throw new Error('Invalid property plans');
+  return {flow:'corporateluxe-v2',requestId,firstName,fullName,email,mobile,postcode,bedrooms:p.bedrooms,lettingDuration:p.lettingDuration,propertyScope:p.propertyScope,startTime:p.startTime};
+}
+function savePropertyEnquiry(sheet, lead, p) {
+  const allHeaders=HEADERS.concat(ENQUIRY_EXTRA_HEADERS);
+  // Append columns after the existing schema; preserve all existing leads and column indexes.
+  sheet.getRange(1,HEADERS.length+1,1,ENQUIRY_EXTRA_HEADERS.length).setValues([ENQUIRY_EXTRA_HEADERS]);
+  const row=[new Date(),safeCell(lead.firstName),safeCell(lead.email),"'"+lead.mobile,lead.postcode,lead.bedrooms,'','','','','Property Earnings Calculator','New Lead','Yes — property enquiry only; no unrelated marketing','property-enquiry-v2',lead.requestId,'','','','','',safeCell(lead.fullName),lead.lettingDuration,lead.propertyScope,lead.startTime,'Personal review requested','CorporateLuxe / AirLandlords','corporateluxe-v2'];
+  const rows=sheet.getLastRow();
+  const existing=rows>1?sheet.getRange(2,15,rows-1,1).createTextFinder(lead.requestId).matchEntireCell(true).findNext():null;
+  if(existing){
+    const old=sheet.getRange(existing.getRow(),1,1,allHeaders.length).getValues()[0];
+    // Bind every saved field to its retry ID, including qualification answers.
+    for(const i of [1,2,3,4,5,13,14,20,21,22,23,24,25,26])if(String(old[i]).replace(/^'/,'')!==String(row[i]).replace(/^'/,''))throw new Error('Request conflict');
+  } else {
+    sheet.appendRow(row);sheet.getRange(sheet.getLastRow(),1).setNumberFormat('yyyy-mm-dd hh:mm:ss');SpreadsheetApp.flush();
+  }
+  return {type:'airlandlords-lead',requestId:lead.requestId,ok:true,flow:'corporateluxe-v2',estimateStatus:'Personal review requested'};
+}
