@@ -38,3 +38,8 @@ Browser verification so far: public page opens without PIN; full postcode is nor
 The root page now introduces the offer for London landlords, explains the three-step journey and leads into the existing calculator. Landing buttons and the Back to introduction control do not reset calculation/contact inputs. `#estimate` opens the property inputs directly. `landing.css` and `landing.js` contain the introduction; the underlying calculator and Google storage are unchanged. The two landlord JPEG assets provide illustrative imagery and a social link preview. They were created with AI and are not claimed to depict a managed property.
 
 Ready-to-share feed and story graphics, captions and publishing notes are in the local campaign folder. Add the calculator link to the Instagram bio or story link sticker before publishing. No social posts or paid ads are published automatically.
+
+
+## Brand variants
+
+Customer-facing wording uses AirLandlords and CorporateLuxe, matching the partnership stated on corporateluxe.co.uk. The root is the AirLandlords-led version; corporateluxe.html is the CorporateLuxe-led version. Both use the existing calculator and private enquiry storage. The GitHub owner name in technical URLs has not changed. No change to the separate CorporateLuxe WordPress website is included.
