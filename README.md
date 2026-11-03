@@ -39,3 +39,7 @@ GitHub documentation: https://docs.github.com/en/pages/configuring-a-custom-doma
 Run `node verify.mjs`: retained legacy server calculation/receipt, retries, conflicts, malformed submissions, enquiry consent, formula escaping, plus new qualified-enquiry storage, added columns, blank estimate fields, allowed origins and failure handling. Browser QA covers property → plans → contact → confirmed write, mobile layout and saved Sheet field readback. Tests use synthetic `calculator-test@example.com` / `07700 900123` contacts.
 
 No social posts, marketing emails or ads are sent automatically. Campaign artwork uses an AI-generated illustrative interior, not a claimed managed property. Prepared captions describe a personal review rather than an instant calculation.
+
+## Calendly — deferred until tomorrow
+
+Set `calendlyUrl` in `config.js` to the confirmed landlord-call Calendly event URL. `enquiry.js` accepts only HTTPS links on calendly.com and changes the final call action to `Book a call` after a saved enquiry. Until configured, it remains a telephone contact action. Do not invent a booking URL. No booking is created automatically. The user deferred both GoDaddy and Calendly to the next morning.
