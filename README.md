@@ -23,16 +23,13 @@ Existing columns A:T and all previous leads remain intact. Column F now stores b
 
 Synthetic test enquiries are labelled `Test - do not contact` after readback. Do not follow them up.
 
-## Branded domain — pending DNS access
+## Branded domain — configured, certificate pending
 
-Preferred address: `https://calculator.corporateluxe.co.uk/`. This is not live until the following is completed. CorporateLuxe nameservers are `ns15.domaincontrol.com` and `ns16.domaincontrol.com` (GoDaddy DNS). The GoDaddy dashboard currently needs the user to sign in.
+Address: `https://calculator.corporateluxe.co.uk/`.
 
-1. Confirm domain ownership / sign in to the correct GoDaddy account. Preserve the main WordPress website, MX records and existing DNS.
-2. GitHub repository Settings → Pages → Custom domain: enter `calculator.corporateluxe.co.uk` and save. Do this when DNS access is ready, because it redirects the current GitHub Pages address to the custom domain.
-3. Add only a CNAME record: host `calculator`, target `ceptrade.github.io`, TTL default. Do not include `/Calculator/` in the DNS target. If the host already has a record, inspect it before replacing anything.
-4. Wait for the GitHub DNS check and certificate; enable Enforce HTTPS when available. Never bypass certificate warnings.
-5. Update the social image URLs in both HTML files to the custom-domain absolute URL and social captions to the final branded URL. Relative asset/form/privacy links already work at a domain root. The receiver already allows `https://calculator.corporateluxe.co.uk` and CorporateLuxe website origins.
-6. Verify the full form on the branded domain, confirm a saved test row, then mark that row as a test. Only then share the branded link.
+On 4 November 2026, GitHub Pages custom domain was saved and GoDaddy CNAME `calculator` → `ceptrade.github.io` added. Public DNS resolves the CNAME. The main website and existing mail records were preserved. Both public HTML files now use the branded canonical/share URLs; campaign captions also use the new address. The receiver already allows the branded HTTPS origin.
+
+Remaining launch verification: let GitHub's DNS check and certificate provisioning finish, enable Enforce HTTPS, then verify the full form on the branded domain and confirm a saved synthetic test row. Mark that row `Test - do not contact` before sharing the link. Never bypass a certificate warning. Keep the repository's `CNAME` file when republishing.
 
 A simple redirect/forward to GitHub would show the GitHub address after navigation. A custom-domain connection keeps CorporateLuxe in the address bar. Alternatively the static files can be served from the existing website hosting at `/calculator/`; the WordPress hosting dashboard is needed for that route.
 
@@ -44,8 +41,8 @@ Run `node verify.mjs`: retained legacy server calculation/receipt, retries, conf
 
 No social posts, marketing emails or ads are sent automatically. Campaign artwork uses an AI-generated illustrative interior, not a claimed managed property. Prepared captions can describe the income projection, monthly breakdown and report.
 
-## Calendly — deferred until tomorrow
+## Calendly — awaiting event link
 
-Set `calendlyUrl` in `config.js` to the confirmed landlord-call Calendly event URL. `enquiry-v3.js` accepts only HTTPS links on calendly.com and changes the final call action to `Book a call` after a saved enquiry. Until configured, it remains a telephone contact action. Do not invent a booking URL. No booking is created automatically. The user deferred both GoDaddy and Calendly to the next morning.
+Set `calendlyUrl` in `config.js` to the confirmed landlord-call Calendly event URL. `enquiry-v3.js` accepts only HTTPS links on calendly.com and changes the final call action to `Book a call` after a saved enquiry. Until configured, it remains a telephone contact action. Do not invent a booking URL. No booking is created automatically. The user deferred Calendly; a confirmed booking link is still needed.
 
 The prior `enquiry.js` remains for cached V2 pages. V3 uses its own script filename so publishing the new result flow does not break visitors using an older cached form.
