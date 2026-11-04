@@ -14,5 +14,21 @@ rows[1][11]='Test - do not contact';assert.equal(send(body).ok,true);
 for(const change of [{bedrooms:3},{propertyScope:'Private room'},{startTime:'2–6 months'},{email:'other@example.com'}])assert.equal(send({...body,...change}).ok,false);
 for(const change of [{consent:false},{bedrooms:11},{bedrooms:'2'},{lettingDuration:'anything'},{origin:'https://evil.example'},{mobile:'123'},{email:'invalid'},{postcode:'bad'},{fullName:'Other name'}])assert.equal(send({...body,...change,requestId:'22345678-1234-1234-1234-123456789abc'}).ok,false);
 fail=true;assert.equal(send({...body,requestId:'32345678-1234-1234-1234-123456789abc'}).ok,false);assert.equal(writes,1);
-new vm.Script(readFileSync(new URL('./enquiry.js',import.meta.url),'utf8'));
+new vm.Script(readFileSync(new URL('./enquiry-v3.js',import.meta.url),'utf8'));
 console.log('PASS: enquiry storage, added columns, bedrooms/plans, no fabricated estimate, receipt, deduplication, changed-payload conflicts, validation, consent, allowed origins and storage failure.');
+
+// V3: approved fixed benchmark, server-authoritative seasonal result, compatible V2 records.
+fail=false;
+const v3={...body,flow:'corporateluxe-v3',monthlyRent:1800,requestId:'42345678-1234-1234-1234-123456789abc'};
+const receipt=send(v3);assert.equal(receipt.ok,true);assert.equal(receipt.flow,'corporateluxe-v3');assert.equal(receipt.projection.averageMonthly,2478);assert.equal(receipt.projection.annual,29736);assert.deepEqual(receipt.projection.months.map(m=>m.amount),[2016,2016,2520,2520,2520,3024,3024,3024,2520,2520,2016,2016]);
+assert.equal(rows[2][6],2478);assert.equal(rows[2][7],29736);assert.equal(rows[2][8],21600);assert.equal(rows[2][9],8136);assert.equal(rows[2][15],1800);assert.equal(rows[2][17],40);assert.equal(rows[2][24],'Short-let income projection');assert.equal(writes,2);assert.equal(send(v3).ok,true);assert.equal(writes,2);
+assert.equal(send({...v3,monthlyRent:1900}).ok,false);
+for(const monthlyRent of [0,-1,100001,'1800',null,1.234])assert.equal(send({...v3,monthlyRent,requestId:'52345678-1234-1234-1234-123456789abc'}).ok,false);
+const projectionContext=vm.createContext({});vm.runInContext(readFileSync(new URL('./estimate.js',import.meta.url),'utf8'),projectionContext);
+for(const rent of [.01,1,875.25,1800,2249.99,100000]){const server=JSON.parse(vm.runInContext(`JSON.stringify(projectMonthlyRent(${rent}))`,context));const client=JSON.parse(vm.runInContext(`JSON.stringify(CorporateLuxeProjection.calculate(${rent}))`,projectionContext));assert.deepEqual(client,server);}
+// Verify against the retained original public calculator, not a second copy of the new formula.
+const elements=new Map(),get=id=>{if(!elements.has(id))elements.set(id,{value:'',style:{display:'none'},classList:{add(){},remove(){},toggle(){}},addEventListener(){}});return elements.get(id);};
+const originalContext=vm.createContext({document:{getElementById:get},localStorage:{getItem(){return null;}},window:{},console});
+const original=readFileSync(new URL('./admin.html',import.meta.url),'utf8').match(/<script>\s*\/\/[\s\S]*?<\/script>/)[0].replace(/^<script>|<\/script>$/g,'');vm.runInContext(original,originalContext);
+for(const rent of [.01,1,875.25,1800,2249.99,100000]){get('in-market').value=String(rent);get('in-standard').value='';get('in-postcode').value='SW6 1AA';vm.runInContext('upliftPct=40;condition="same";renderChart=()=>{};switchTab=()=>{};calculate();',originalContext);const old=JSON.parse(vm.runInContext('JSON.stringify(lastResult)',originalContext));const current=JSON.parse(JSON.stringify(projectionContext.CorporateLuxeProjection.calculate(rent)));assert.equal(current.annual,old.airAnnual);assert.equal(current.averageMonthly,old.avgMonthly);assert.deepEqual(current.months.map(m=>m.amount),old.monthlyBreakdown.map(m=>m.amount));}
+console.log('PASS: V3 original-calculator month values and rounding, 40% benchmark, confirmed saved totals, current-rent validation, V2 compatibility and retry conflicts.');
