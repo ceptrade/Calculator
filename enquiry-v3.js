@@ -63,7 +63,7 @@
   $('download-estimate').addEventListener('click',()=>{
     if(!savedProjection||!savedContact)return;
     $('pdf-error').textContent='';
-    try{if(!window.jspdf?.jsPDF)throw new Error('PDF unavailable');const doc=window.CorporateLuxeProjection.pdf(savedProjection,savedContact,window.jspdf.jsPDF);doc.save('CorporateLuxe_Income_Projection_'+savedContact.postcode.replace(/\s/g,'')+'.pdf');}catch{$('pdf-error').textContent='The PDF could not load. Your estimate is still available above. Please try again or contact our team.';}
+    try{if(!window.jspdf?.jsPDF)throw new Error('PDF unavailable');const doc=window.CorporateLuxeProjection.pdf(savedProjection,savedContact,window.jspdf.jsPDF);doc.save('AirLandlords_Income_Projection_'+savedContact.postcode.replace(/\s/g,'')+'.pdf');}catch{$('pdf-error').textContent='The PDF could not load. Your estimate is still available above. Please try again or contact our team.';}
   });
 
   steps.slice(1).forEach(el=>el.querySelectorAll('input').forEach(input=>input.disabled=true));
