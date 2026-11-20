@@ -32,3 +32,9 @@ const originalContext=vm.createContext({document:{getElementById:get},localStora
 const original=readFileSync(new URL('./admin.html',import.meta.url),'utf8').match(/<script>\s*\/\/[\s\S]*?<\/script>/)[0].replace(/^<script>|<\/script>$/g,'');vm.runInContext(original,originalContext);
 for(const rent of [.01,1,875.25,1800,2249.99,100000]){get('in-market').value=String(rent);get('in-standard').value='';get('in-postcode').value='SW6 1AA';vm.runInContext('upliftPct=40;condition="same";renderChart=()=>{};switchTab=()=>{};calculate();',originalContext);const old=JSON.parse(vm.runInContext('JSON.stringify(lastResult)',originalContext));const current=JSON.parse(JSON.stringify(projectionContext.CorporateLuxeProjection.calculate(rent)));assert.equal(current.annual,old.airAnnual);assert.equal(current.averageMonthly,old.avgMonthly);assert.deepEqual(current.months.map(m=>m.amount),old.monthlyBreakdown.map(m=>m.amount));}
 console.log('PASS: V3 original-calculator month values and rounding, 40% benchmark, confirmed saved totals, current-rent validation, V2 compatibility and retry conflicts.');
+
+// New branded origin must store a confirmed enquiry without changing the model.
+const airLead={...v3,origin:'https://calculator.airlandlords.co.uk',requestId:'62345678-1234-1234-1234-123456789abc'};
+assert.equal(send(airLead).ok,true);assert.equal(rows[3][25],'AirLandlords');assert.equal(rows[3][7],29736);assert.equal(send(airLead).ok,true);assert.equal(writes,3);
+assert.equal(send({...airLead,origin:'https://evil.example',requestId:'72345678-1234-1234-1234-123456789abc'}).ok,false);
+console.log('PASS: AirLandlords origin, saved brand, unchanged estimate, retry receipt and rejected foreign origin.');
