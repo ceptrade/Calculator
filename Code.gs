@@ -1,5 +1,5 @@
 // Deploy as a Web app: execute as owner, access Anyone. The Sheet stays private.
-const ALLOWED_ORIGINS = ['https://ceptrade.github.io', 'http://127.0.0.1:8787', 'https://calculator.corporateluxe.co.uk', 'https://corporateluxe.co.uk', 'https://www.corporateluxe.co.uk'];
+const ALLOWED_ORIGINS = ['https://ceptrade.github.io', 'http://127.0.0.1:8787', 'https://calculator.corporateluxe.co.uk', 'https://corporateluxe.co.uk', 'https://www.corporateluxe.co.uk', 'https://calculator.airlandlords.co.uk', 'https://airlandlords.co.uk', 'https://www.airlandlords.co.uk'];
 const HEADERS = ['Timestamp', 'First Name', 'Email', 'Mobile Phone', 'Property Postcode', 'Bedrooms', 'Average Monthly Estimate GBP', 'Annual Estimate GBP', 'Standard Annual GBP', 'Extra Annual GBP', 'Source', 'Status', 'Enquiry Consent', 'Consent Version', 'Request ID', 'Market Monthly GBP', 'Standard Monthly GBP', 'Uplift Percent', 'Condition', 'Monthly Breakdown JSON'];
 
 function setup() {
@@ -108,7 +108,7 @@ function savePropertyEnquiry(sheet, lead, p) {
   // Append columns after the existing schema; preserve all existing leads and column indexes.
   sheet.getRange(1,HEADERS.length+1,1,ENQUIRY_EXTRA_HEADERS.length).setValues([ENQUIRY_EXTRA_HEADERS]);
   const q=lead.projection, estimateStatus=q?'Short-let income projection':'Personal review requested';
-  const row=[new Date(),safeCell(lead.firstName),safeCell(lead.email),"'"+lead.mobile,lead.postcode,lead.bedrooms,q?q.averageMonthly:'',q?q.annual:'',q?q.standardAnnual:'',q?q.extraAnnual:'','Property Earnings Calculator','New Lead','Yes — property enquiry only; no unrelated marketing','property-enquiry-v2',lead.requestId,q?q.monthlyRent:'',q?q.monthlyRent:'',q?40:'',q?'same':'',q?JSON.stringify(q.months.map(m=>m.amount)):'',safeCell(lead.fullName),lead.lettingDuration,lead.propertyScope,lead.startTime,estimateStatus,'CorporateLuxe / AirLandlords',lead.flow];
+  const row=[new Date(),safeCell(lead.firstName),safeCell(lead.email),"'"+lead.mobile,lead.postcode,lead.bedrooms,q?q.averageMonthly:'',q?q.annual:'',q?q.standardAnnual:'',q?q.extraAnnual:'','Property Earnings Calculator','New Lead','Yes — property enquiry only; no unrelated marketing','property-enquiry-v2',lead.requestId,q?q.monthlyRent:'',q?q.monthlyRent:'',q?40:'',q?'same':'',q?JSON.stringify(q.months.map(m=>m.amount)):'',safeCell(lead.fullName),lead.lettingDuration,lead.propertyScope,lead.startTime,estimateStatus,p.origin==='https://calculator.airlandlords.co.uk'?'AirLandlords':'CorporateLuxe / AirLandlords',lead.flow];
   const rows=sheet.getLastRow();
   const existing=rows>1?sheet.getRange(2,15,rows-1,1).createTextFinder(lead.requestId).matchEntireCell(true).findNext():null;
   if(existing){
