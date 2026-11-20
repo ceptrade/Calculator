@@ -29,7 +29,9 @@ New address: `https://calculator.airlandlords.co.uk/`.
 
 GitHub Pages custom domain and repository CNAME changed to the new address. Squarespace DNS for airlandlords.co.uk has CNAME `calculator` → `ceptrade.github.io` (4-hour TTL). Main website and mail records remain unchanged. Public HTML, consent/privacy, canonical/share URLs and PDF branding use AirLandlords. The Apps Script receiver was updated in place to version 7 with the new HTTPS origin allowed and new-domain enquiries labelled AirLandlords. Existing endpoint, private Sheet, previous leads, legacy clients and calculation are retained.
 
-Certificate provisioning and final new-domain browser verification must be checked before launch. Never bypass a certificate warning. Keep `CNAME` when republishing. The previous CorporateLuxe address needs an explicit redirect to preserve old shared links; changing GitHub's custom domain alone does not create one.
+HTTPS certificate is active and Enforce HTTPS is enabled. HTTP was verified to redirect to HTTPS. The live mobile enquiry saved test request `f9453ee0-64b4-4397-9374-1da788f9efb5` to Calculator Leads row 21 with brand AirLandlords and correct totals. Its status was changed to `Test - do not contact` after readback. The live PDF downloaded with the AirLandlords filename and branding; totals and rendered layout were verified. Keep `CNAME` when republishing.
+
+GoDaddy subdomain-only permanent (301) forwarding was saved for `calculator.corporateluxe.co.uk` → `https://calculator.airlandlords.co.uk/`. GoDaddy replaced that subdomain's old GitHub CNAME with its forwarding A records (15.197.142.173 and 3.33.152.147, 600-second TTL). Root website and mail records were not edited. The forward can take up to 48 hours to propagate and its HTTPS certificate can take a few hours; end-to-end old-link forwarding is still pending propagation. Use the new AirLandlords URL for new shares.
 
 ## Validation
 
