@@ -1,0 +1,25 @@
+/* Compact, light presentation for the main-site embed only. */
+body.calculator-embed{--gold:#896a25;--text:#252c28;--dim:#59615b;--line:#e4dfd4;--black:#fffdf8;background:#fffdf8;color:var(--text);}
+.calculator-embed #enquiry-screen>.lp-header,.calculator-embed #back-intro,.calculator-embed .wizard>.eyebrow,.calculator-embed #wizard-title,.calculator-embed .wizard-intro,.calculator-embed .wizard-footer{display:none!important;}
+.calculator-embed .wizard{margin:0;padding:24px;max-width:none;}
+.calculator-embed .wizard h2{font-size:1.85rem;line-height:1.12;margin:0 0 18px;color:var(--text);}
+.calculator-embed .progress{margin:0 0 22px;gap:12px;}
+.calculator-embed .progress li{font-size:.72rem;padding:8px 0;}
+.calculator-embed .progress span{margin-left:3px;}
+.calculator-embed .wizard label:not(.choices label):not(.consent){margin:14px 0 7px;}
+.calculator-embed .wizard input:not([type=radio]):not([type=checkbox]):not([type=hidden]){min-height:48px;padding:12px 14px;background:#fff;border-color:#cfc9bc;color:var(--text);}
+.calculator-embed input::placeholder{color:#737a74;}
+.calculator-embed .bedroom-control{min-height:48px;background:#fff;border-color:#cfc9bc;}
+.calculator-embed .bedroom-control button{min-height:48px;}
+.calculator-embed .wizard fieldset{margin:18px 0;}
+.calculator-embed .wizard legend{font-size:.87rem;margin-bottom:10px;}
+.calculator-embed .hint{font-size:.76rem;margin:7px 0 13px;}
+.calculator-embed .primary{min-height:48px;margin-top:20px;padding:13px 17px;background:#c9ad5a;border-color:#c9ad5a;color:#20261f;}
+.calculator-embed .choices span{border-color:#cfc9bc;background:#fff;min-height:53px;padding:12px 9px;font-size:.82rem;}
+.calculator-embed .choices input:checked+span{background:#efdfaf;border-color:#ac8b3c;color:#252c28;}
+.calculator-embed .consent{margin:18px 0;color:var(--dim);font-size:.76rem;}
+.calculator-embed .review{background:#f5f2e9;border-color:#e4dfd4;padding:14px;margin:18px 0;}
+.calculator-embed .error{color:#a02d23;}
+.calculator-embed .estimate-hero{background:#f5f0df;border-color:#c9ad5a;}
+.calculator-embed .projection-track{background:#e8e5dc;}
+@media(max-width:400px){.calculator-embed .wizard{padding:20px;}.calculator-embed .progress{gap:8px;}.calculator-embed .progress li{font-size:.66rem;}.calculator-embed .wizard h2{font-size:1.7rem;}}
